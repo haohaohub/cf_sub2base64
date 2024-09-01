@@ -2,15 +2,12 @@ name: yxcfip
 
 on:
   workflow_dispatch:
-  schedule:
+  # schedule:
     # Expression generated from https://crontab.guru/
-    - cron: '1 0,4,6,10,13,14,15 * * *'
-  push:
-    paths:
-      - 'secrets.ip.txt'
-      - 'secrets.cfip.txt'
-      - '.github/workflows/**'
-      - '**.py'
+    # - cron: '1 0,4,6,10,13,14,15 * * *'
+  repository_dispatch:
+    types:
+      - webhook
 
 jobs:
   deploy:
