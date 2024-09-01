@@ -90,7 +90,7 @@ for urlraw in urls:
                 extractedData += content + "\n"
                 ipSet.append(ip_address)
                 nameCountMap.append(name)
-                print("添加:" + newName + ", " + len(nameCountMap))
+                print("添加:" + newName + ", " + str(len(nameCountMap)))
             #大于10个退出循环
             if len(nameCountMap) > 10:
                 break
