@@ -8,7 +8,7 @@ import base64
 
 def commit_and_push_to_github():
     # 从 Secrets 中获取访问令牌
-    access_token = os.environ['urls']
+    #access_token = os.environ['urls']
 
     # 设置 Git 的身份验证信息
     os.system(f'git config --global user.email "you@example.com"')
@@ -18,7 +18,7 @@ def commit_and_push_to_github():
     # 添加更改、提交更改和推送更改
     os.system('git add cfip.txt')
     os.system(f'git commit -m "Update cfip.txt"')
-    os.system(f'git push https://{access_token}@github.com/username/repository.git main')
+    os.system(f'git push')
 
 
 headers = {
@@ -41,11 +41,11 @@ urls = os.environ['urls']
 urls = urls.split("\n")
 ipSet = []
 extractedData = ""
-for url in urls:
+for urlraw in urls:
     nameCountMap = []
     # print(url)
     try:
-        url = urlparse.urlparse(url)
+        url = urlparse.urlparse(urlraw)
         if url.hostname == None:
             continue
         requesturl = url.scheme + "://" + url.hostname + url.path
@@ -55,6 +55,7 @@ for url in urls:
         # print(html_content)
         contents = base64.b64decode(html_content).decode('utf-8').split("\n")
     except:
+        print("Error url:" + urlraw)
         continue
     for content in contents:
         if not content.startswith("vless"):
@@ -67,6 +68,7 @@ for url in urls:
                 cfip = "http://" + ip_address + ":" + str(port)
                 cfipstatus = requests.get(cfip, timeout=3, verify=False, headers={'Connection': 'close'}, proxies=proxies)
             except:
+                print("Error content:" + content)
                 continue
             if cfipstatus.status_code != 400:
                 continue
@@ -74,7 +76,7 @@ for url in urls:
             if hash_index != -1:
                 name = content[hash_index + 1:]
             else:
-                name = ''
+                name = 'unknown'
             # 去掉重复的IP地址
             if ip_address in ipSet:
                 continue
