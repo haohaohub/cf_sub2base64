@@ -8,7 +8,7 @@ import base64
 
 def commit_and_push_to_github():
     # 从 Secrets 中获取访问令牌
-    #access_token = os.environ['urls']
+    access_token = os.environ['urls']
 
     # 设置 Git 的身份验证信息
     os.system(f'git config --global user.email "you@example.com"')
@@ -18,7 +18,7 @@ def commit_and_push_to_github():
     # 添加更改、提交更改和推送更改
     os.system('git add cfip.txt')
     os.system(f'git commit -m "Update cfip.txt"')
-    os.system(f'git push')
+    os.system(f'git push https://{access_token}@github.com/username/repository.git main')
 
 
 headers = {
@@ -66,9 +66,9 @@ for urlraw in urls:
                 ip_address = match.group(1)
                 port = int(match.group(2))
                 cfip = "http://" + ip_address + ":" + str(port)
-                cfipstatus = requests.get(cfip, timeout=3, verify=False, headers={'Connection': 'close'}, proxies=proxies)
+                cfipstatus = requests.get(cfip, timeout=1.5, verify=False, headers={'Connection': 'close'}, proxies=proxies)
             except:
-                print("Error content:" + content)
+                #print("Error content:" + content)
                 continue
             if cfipstatus.status_code != 400:
                 continue
@@ -90,6 +90,7 @@ for urlraw in urls:
                 extractedData += content + "\n"
                 ipSet.append(ip_address)
                 nameCountMap.append(name)
+                print("添加:" + newName + ", " + len(nameCountMap))
             #大于10个退出循环
             if len(nameCountMap) > 10:
                 break
