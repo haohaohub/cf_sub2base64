@@ -1,0 +1,77 @@
+name: yxcfip
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Expression generated from https://crontab.guru/
+    - cron: '1 0,4,6,10,13,14,15 * * *'
+  push:
+    paths:
+      - 'secrets.ip.txt'
+      - 'secrets.cfip.txt'
+      - '.github/workflows/**'
+      - '**.py'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+
+      - name: Set timezone
+        run: sudo timedatectl set-timezone 'Asia/Shanghai'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run task
+        env:
+          urls: ${{secrets.urls}}
+          socksproxy: ${{secrets.SOCKSPROXY}}
+          ACTIONS_DEPLOY_KEY: ${{secrets.KEY}}
+        run: |
+          python yxcfip.py
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          branch: main
+          force_with_lease: true
+          directory: .
+
+      - name: Calculate URLs to purge
+        id: purge_urls
+        run: |
+          sleep 3
+          baseUrl="https://cdn.jsdelivr.net/gh/${{ github.repository }}@master"
+          urls=""
+          for f in $(find snippets -name "*.txt" -type f); do
+            urls+="${baseUrl}/${f},"
+          done
+          for f in $(find . -name "*.txt" -type f -maxdepth 1); do
+            urls+="${baseUrl}/${f},"
+          done
+          echo "urls=${urls%,*}" >> $GITHUB_ENV
+
+      - name: Purge JsDelivr CDN cache
+        uses: egad13/purge-jsdelivr-cache@v1
+        with:
+          url: ${{ steps.purge_urls.outputs.urls }}
+        continue-on-error: true
+
+      - name: 删除运行记录
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 0
+          keep_minimum_runs: 1
+          token: ${{ secrets.TOKEN }}
