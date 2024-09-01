@@ -18,7 +18,7 @@ def commit_and_push_to_github():
     # 添加更改、提交更改和推送更改
     os.system('git add cfip.txt')
     os.system(f'git commit -m "Update cfip.txt"')
-    os.system(f'git push https://{access_token}@github.com/username/repository.git main')
+    os.system(f'git push')
 
 
 headers = {
