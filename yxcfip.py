@@ -79,9 +79,13 @@ for urlraw in urls:
             else:
                 name = 'unknown'
             # 去掉特殊名字
+            skip_content = False
             for item in passnamelist:
-                if item in name.lower():
-                    continue
+                if item in urlparse.unquote(name).lower():
+                    skip_content = True
+                    break
+            if skip_content:
+                continue
 
             # 去掉重复的IP地址
             if ip_address in ipSet:
