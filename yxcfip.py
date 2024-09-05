@@ -56,7 +56,7 @@ for urlraw in urls:
         # print(html_content)
         contents = base64.b64decode(html_content).decode('utf-8').split("\n")
     except:
-        print("Error url:" + urlraw)
+        print("Error url:" + urlparse.urlparse(urlraw).hostname)
         continue
     for content in contents:
         if not content.startswith("vless"):
