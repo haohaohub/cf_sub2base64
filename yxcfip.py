@@ -38,6 +38,7 @@ params = {
 proxies = {'all':os.environ['socksproxy']}  
 urls = os.environ['urls']
 
+passnamelist = ["hk", "香港", "hong kong"]
 urls = urls.split("\n")
 ipSet = []
 extractedData = ""
@@ -77,6 +78,11 @@ for urlraw in urls:
                 name = content[hash_index + 1:]
             else:
                 name = 'unknown'
+            # 去掉特殊名字
+            for item in passnamelist:
+                if item in name.lower():
+                    continue
+
             # 去掉重复的IP地址
             if ip_address in ipSet:
                 continue
