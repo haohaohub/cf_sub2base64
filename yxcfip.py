@@ -38,7 +38,7 @@ params = {
 proxies = {'all':os.environ['socksproxy']}  
 urls = os.environ['urls']
 
-passnamelist = ["hk", "香港", "hong kong"]
+passnamelist = ["hk", "香港", "hong kong", "cmcc", "ct", "移动", "联通", "电信"]
 urls = urls.split("\n")
 ipSet = []
 extractedData = ""
