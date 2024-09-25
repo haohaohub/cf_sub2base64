@@ -66,7 +66,7 @@ for urlraw in urls:
             try:
                 ip_address = match.group(1)
                 port = int(match.group(2))
-                cfip = "http://" + ip_address + ":" + str(port)
+                cfip = "http://" + ip_address + ":" + str(port) + "/cdn-cgi/trace"
                 cfipstatus = requests.get(cfip, timeout=1.5, verify=False, headers={'Connection': 'close'}, proxies=proxies)
             except:
                 #print("Error content:" + content)
