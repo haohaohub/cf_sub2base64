@@ -114,4 +114,5 @@ with open('cfip.txt', 'w') as file2:
     cfipbase64 = base64.b64encode(extractedData.encode('utf-8')).decode("utf-8")
     file2.write(cfipbase64)
 print("数据已经保存到 cfip.txt")
+print('程序运行总时间:%s毫秒' % ((time.time() - start_time)*1000))
 commit_and_push_to_github()
