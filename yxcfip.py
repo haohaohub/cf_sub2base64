@@ -76,6 +76,9 @@ for urlraw in urls:
 
             try:
                 ip_address = match.group(1)
+                # 去掉重复的IP地址
+                if ip_address in ipSet:
+                    continue
                 port = int(match.group(2))
                 cfip = "http://" + ip_address + ":" + str(port) + "/cdn-cgi/trace"
                 cfipstatus = requests.get(cfip, timeout=1.5, verify=False, headers={'Connection': 'close'}, proxies=proxies)
@@ -94,21 +97,17 @@ for urlraw in urls:
             if skip_content:
                 continue
 
-            # 去掉重复的IP地址
-            if ip_address in ipSet:
-                continue
             #统计名字出现的次数
             namecount = nameCountMap.count(name)
-            if namecount < 2:
-                if namecount == 0:
-                    newName = name
-                else:
-                    newName = name + "~" + str(namecount)
-                extractedData += content + "\n"
-                ipSet.append(ip_address)
-                nameCountMap.append(name)
-                print("添加:" + newName + ", " + str(len(nameCountMap)))
-                print('程序运行时间:%s毫秒' % ((time.time() - start_time)*1000))
+            if namecount == 0:
+                newName = name
+            else:
+                newName = name + "~" + str(namecount)
+            extractedData += content + "\n"
+            ipSet.append(ip_address)
+            nameCountMap.append(name)
+            print("添加:" + newName + ", " + str(len(nameCountMap)))
+            print('程序运行时间:%s毫秒' % ((time.time() - start_time)*1000))
             #大于10个退出循环
             if len(nameCountMap) > 10:
                 break
