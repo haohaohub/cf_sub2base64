@@ -70,6 +70,7 @@ for urlraw in urls:
                 name = content[hash_index + 1:]
             else:
                 name = 'unknown'
+            #统计名字出现的次数
             namecount = nameCountMap.count(name)
             if namecount >= 2:
                 continue
@@ -97,8 +98,6 @@ for urlraw in urls:
             if skip_content:
                 continue
 
-            #统计名字出现的次数
-            namecount = nameCountMap.count(name)
             if namecount == 0:
                 newName = name
             else:
