@@ -65,6 +65,15 @@ for urlraw in urls:
             continue
         match = re.search(r'@((?:\d{1,3}\.){3}\d{1,3}):(\d+)', content)
         if match:
+            hash_index = content.find('#')
+            if hash_index != -1:
+                name = content[hash_index + 1:]
+            else:
+                name = 'unknown'
+            namecount = nameCountMap.count(name)
+            if namecount >= 2:
+                continue
+
             try:
                 ip_address = match.group(1)
                 port = int(match.group(2))
@@ -75,11 +84,7 @@ for urlraw in urls:
                 continue
             if cfipstatus.status_code != 400:
                 continue
-            hash_index = content.find('#')
-            if hash_index != -1:
-                name = content[hash_index + 1:]
-            else:
-                name = 'unknown'
+
             # 去掉特殊名字
             skip_content = False
             for item in passnamelist:
