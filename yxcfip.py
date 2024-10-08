@@ -43,6 +43,7 @@ passnamelist = ["cmcc", "ct", "移动", "联通", "电信"]
 urls = urls.split("\n")
 ipSet = []
 extractedData = ""
+start_time = time.time()
 for urlraw in urls:
     nameCountMap = []
     # print(url)
@@ -102,10 +103,11 @@ for urlraw in urls:
                 ipSet.append(ip_address)
                 nameCountMap.append(name)
                 print("添加:" + newName + ", " + str(len(nameCountMap)))
+                print('程序运行时间:%s毫秒' % ((time.time() - start_time)*1000))
             #大于10个退出循环
             if len(nameCountMap) > 10:
                 break
-
+    print('url运行时间:%s毫秒' % ((time.time() - start_time)*1000))
 
 
 with open('cfip.txt', 'w') as file2:
