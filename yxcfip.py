@@ -37,13 +37,17 @@ params = {
 }
 proxies = {'all':os.environ['socksproxy']}  
 urls = os.environ['urls']
+mnurls = os.environ['mnurls']
 
 # "hk", "香港", "hong kong", 
 passnamelist = ["cmcc", "ct", "移动", "联通", "电信"]
 urls = urls.split("\n")
+mnurls = mnurls.split("\n")
+
 ipSet = []
 extractedData = ""
 start_time = time.time()
+
 for urlraw in urls:
     nameCountMap = []
     # print(url)
@@ -106,16 +110,83 @@ for urlraw in urls:
             ipSet.append(ip_address)
             nameCountMap.append(name)
             print("添加:" + newName + ", " + str(len(nameCountMap)))
-            print('程序运行时间:%s毫秒' % ((time.time() - start_time)*1000))
+            print('程序运行时间:%s秒' % ((time.time() - start_time)))
             #大于10个退出循环
             if len(nameCountMap) > 10:
                 break
-    print('url运行时间:%s毫秒' % ((time.time() - start_time)*1000))
+    print('url运行时间:%s秒' % ((time.time() - start_time)))
+    
+for urlraw in mnurls:
+    nameCountMap = []
+    # print(url)
+    try:
+        url = urlparse.urlparse(urlraw)
+        if url.hostname == None:
+            continue
+        requesturl = url.scheme + "://" + url.hostname + url.path
+        params = dict(urlparse.parse_qsl(url.query))
+        response = requests.get(requesturl,  params=params, headers=headers)
+        html_content = response.text
+        # print(html_content)
+        contents = base64.b64decode(html_content).decode('utf-8').split("\n")
+    except:
+        print("Error mnurl:" + urlparse.urlparse(urlraw).hostname)
+        continue
+    for content in contents:
+        if not content.startswith("vless"):
+            continue
+        match = re.search(r'@((?:\d{1,3}\.){3}\d{1,3}):(\d+)', content)
+        if match:
+            hash_index = content.find('#')
+            if hash_index != -1:
+                name = content[hash_index + 1:]
+            else:
+                name = 'unknown'
+            #统计名字出现的次数
+            namecount = nameCountMap.count(name)
+            # if namecount >= 10:
+            #     continue
 
+            try:
+                ip_address = match.group(1)
+                # 去掉重复的IP地址
+                if ip_address in ipSet:
+                    continue
+                port = int(match.group(2))
+                cfip = "http://" + ip_address + ":" + str(port) + "/cdn-cgi/trace"
+                cfipstatus = requests.get(cfip, timeout=1.5, verify=False, headers={'Connection': 'close'}, proxies=proxies)
+            except:
+                #print("Error content:" + content)
+                continue
+            if cfipstatus.status_code != 400:
+                continue
+
+            # 去掉特殊名字
+            skip_content = False
+            for item in passnamelist:
+                if item in urlparse.unquote(name).lower():
+                    skip_content = True
+                    break
+            if skip_content:
+                continue
+
+            if namecount == 0:
+                newName = name
+            else:
+                newName = name + "~" + str(namecount)
+            extractedData += content + "\n"
+            ipSet.append(ip_address)
+            nameCountMap.append(name)
+            print("添加:" + newName + ", " + str(len(nameCountMap)))
+            print('程序运行时间:%s秒' % ((time.time() - start_time)))
+            #大于10个退出循环
+            if len(nameCountMap) > 10:
+                break
+    print('mnurl运行时间:%s秒' % ((time.time() - start_time)))
 
 with open('cfip.txt', 'w') as file2:
     cfipbase64 = base64.b64encode(extractedData.encode('utf-8')).decode("utf-8")
     file2.write(cfipbase64)
 print("数据已经保存到 cfip.txt")
-print('程序运行总时间:%s毫秒' % ((time.time() - start_time)*1000))
+print('程序运行总时间:%s秒' % ((time.time() - start_time)))
 commit_and_push_to_github()
