@@ -65,7 +65,7 @@ for urlraw in urls:
         print("Error url:" + urlparse.urlparse(urlraw).hostname)
         continue
     for content in contents:
-        if not content.startswith("vless"):
+        if not content.startswith(("vless", "trojan")):
             continue
         match = re.search(r'@((?:\d{1,3}\.){3}\d{1,3}):(\d+)', content)
         if match:
