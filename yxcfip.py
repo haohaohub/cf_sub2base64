@@ -44,6 +44,7 @@ passnamelist = ["cmcc", "ct", "移动", "联通", "电信"]
 urls = urls.split("\n")
 mnurls = mnurls.split("\n")
 
+urlipnum = 10
 ipSet = []
 extractedData = ""
 start_time = time.time()
@@ -61,6 +62,10 @@ for urlraw in urls:
         html_content = response.text
         # print(html_content)
         contents = base64.b64decode(html_content).decode('utf-8').split("\n")
+        if len(contents) >30:
+            urlipnum = 5
+        else:
+            urlipnum = 10
     except:
         print("Error url:" + urlparse.urlparse(urlraw).hostname)
         continue
@@ -112,7 +117,7 @@ for urlraw in urls:
             print("添加:" + newName + ", " + str(len(nameCountMap)))
             print('程序运行时间:%s秒' % ((time.time() - start_time)))
             #大于10个退出循环
-            if len(nameCountMap) > 10:
+            if len(nameCountMap) > urlipnum:
                 break
     print('url运行时间:%s秒' % ((time.time() - start_time)))
     
