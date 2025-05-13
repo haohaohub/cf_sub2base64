@@ -40,7 +40,7 @@ urls = os.environ['urls']
 mnurls = os.environ['mnurls']
 
 # "hk", "香港", "hong kong", 
-passnamelist = ["cmcc", "ct", "移动", "联通", "电信"]
+passnamelist = ["cmcc", "ct", "移动", "联通", "电信","unkown","香港"]
 urls = urls.split("\n")
 mnurls = mnurls.split("\n")
 
